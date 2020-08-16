@@ -1,0 +1,94 @@
+<#xml+ version="0.5" encoding="UTF-8" #>
+
+<!DOCTYPE "Mensaje_tipo.dtd"> //Aqui comienza el cuerpo del fichero y este comentario debe ser descartado.
+
+<Asignaturas>
+	
+<!--
+	Apartado de Analisis Lexico y Sintactico.
+
+	Comentario multilinea que no debera ser descartado
+	-->
+	
+	<ALS>
+		
+		<Profesor>
+			
+			<Nombre>JuanPerez</Nombre>
+
+			<Mail>jperez@usj.es</Mail>
+
+		</Profesor>
+
+		<Alumnos>
+
+			<Alumno>
+
+				<Nombre>AlbertoGomezGomez</Nombre>
+
+				<Mail>alu00000@usj.es</Mail>
+
+			</Alumno>
+
+			<Alumno>
+
+				<Nombre>FernandoFernandezFernandez</Nombre>
+
+				<Mail>alu11111@usj.es</Mail>
+
+			</Alumno>
+
+		</Alumnos>
+
+	</ALS>
+
+	 
+<!--
+	ApartadodeProgramacionOrientadaaObjetos.
+	
+		Comentario multilinea que no debera ser descartado
+
+		<!-- Ademas incluye un comentario anidado
+
+		Tambien multilinea
+		-->
+	-->
+
+	<POO>
+
+		<Profesor>
+
+			<Nombre>RamonRamirezRamirez</Nombre>
+
+			<Mail:'rramirez@usj.es'/>
+
+		</Profesor>
+
+		<Alumnos>
+
+			<Alumno>
+
+				<Nombre:'GonzaloGonzalezGonzalez'/>
+
+				<Mail>alu22222@usj.es</Mail>
+
+			</Alumno>
+
+			<Alumno>
+
+				<Nombre>LuisGarciaGarcia</Nombre>
+
+				<Mail>alu33333@gmail.com</Mail>
+
+			</Alumno>
+
+		</Alumnos>
+		//Uso abreviado de elementos finales sin hijos y con comillas simples escapadas
+		
+	</POO>
+	 <!--
+	 Para terminar, un comentario multilinea que contiene "<!--" y "-->" entrecomillados para
+			 ser tratados como texto normal.
+	 -->
+
+</Asignaturas>

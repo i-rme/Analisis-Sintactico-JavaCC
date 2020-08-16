@@ -1,0 +1,177 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+
+options
+{
+  JDK_VERSION = "1.5";
+  STATIC = true;
+  //DEBUG_TOKEN_MANAGER = true;
+  DEBUG_PARSER = true;
+  IGNORE_CASE = true;
+}
+
+PARSER_BEGIN(XML_parser)
+
+  import java.io.*;
+  import java.util.*;
+
+  public class XML_parser {
+
+      public static void main(String[] args) throws ParseException,
+                FileNotFoundException
+       {
+          if ( args.length < 1 ) {
+            System.out.println("Please pass in the filename for a parameter.");
+            System.exit(1);
+        }
+
+        XML_parser parser = new XML_parser( new FileInputStream(args[0]) );
+
+        parser.Input();
+        System.out.println("Parse completed.");
+       }
+     }
+PARSER_END(XML_parser)
+
+TOKEN_MGR_DECLS:
+{
+  //Para anidar comentarios multilínea
+  static int commentNesting=0;  
+}
+
+SKIP:
+{
+  < " " >
+| < "\r" >
+| < "\t" >
+| < "\n" >
+| < "//" (~["\n"])* "\n" > //Salta los comentarios de una línea
+} 
+
+SPECIAL_TOKEN : { "<!--" {commentNesting++;} :IN_COMMENT }
+
+//Permite saltos de línea y anidación de comentarios. Sale al encontrar la secuencia pertinente. Mientras, salta cualquier carácter.
+<IN_COMMENT>
+SPECIAL_TOKEN : 
+{
+  "<!--"  {commentNesting++;}
+| "-->"   {commentNesting--;
+     if (commentNesting == 0)
+      SwitchTo (DEFAULT);
+    }
+| <~[]>
+|   "\"<!--\""  // \” se usa para indicar que “ es un carácter tal cual
+|   "\"-->\""
+}
+
+TOKEN:
+{
+//Tokens versión, encoding, y sus respectivos posibles valores
+  < VERSION : ("version="< NUMEROV >)>
+| < NUMEROV : "\"0.5\"" | "\"1.0\"" | "\"2.0\""  >
+| < ENCODING: ("encoding="< TIPO >)>
+| < TIPO: "\"UTF-8\"" | "\"ISO-8859-1\"">
+//Mensaje tipo con extensión .dtd, y forma del campo de una etiqueta mail
+| < DTD: ("\""(~[" ","\n","\r"])+".dtd\"") >
+| < MAIL: ((["a"-"z","0"-"9"]){1,20}"@"(["a"-"z","0"-"9"]){1,20}"."(["a"-"z","0"-"9"]){2,3}) >
+
+//Declaración de las etiquetas
+| < INI_ASIGNATURAS: "<""Asignaturas"">" >
+| < FIN_ASIGNATURAS: "</""Asignaturas"">" >
+| < INI_PROFESOR: "<""Profesor"">" >
+| < FIN_PROFESOR: "</""Profesor"">" >
+| < INI_ALUMNOS: "<""Alumnos"">" >
+| < FIN_ALUMNOS: "</""Alumnos"">" >
+| < INI_ALUMNO: "<""Alumno"">" >
+| < FIN_ALUMNO: "</""Alumno"">" >
+| < INI_RESUMEN: "<""Resumen"">" >
+| < FIN_RESUMEN: "</""Resumen"">" >
+| < INI_ASIGNATURA: ("<"< TXT >">") >
+| < FIN_ASIGNATURA: ("</"< TXT >">") >
+| < LBLCABECERA: ("<#xml+ " < VERSION > " " < ENCODING > " #>") >
+| < LBLDOC: ("<!DOCTYPE " < DTD > ">") >
+| < LBLMAIL: ("<Mail>"< MAIL >"</Mail>") | ("<Mail:\'"< MAIL >"\'/>")>
+| < LBLGENERICA: ("<"< TXT >">"(["a"-"z","A"-"Z","0"-"9"," "])+"</"< TXT >">") | ("<"< TXT >":\'"(["a"-"z","A"-"Z","0"-"9"," "])+"\'/>") >
+| < TXT: (["a"-"z"] | ["A"-"Z"])+ >
+
+}
+
+/*
+INPUT       -> VERSION  DOCTYPE  CUERPO  <EOF>
+VERSION     -> <LBLCABECERA>
+DOCTYPE     -> <LBLDOC>
+CUERPO      -> <INI_ASIGNATURAS>  {ASIGNATURA}  <FIN_ASIGNATURAS>
+ASIGNATURA    -> <INI_ASIGNATURA>  PROFESOR  ALUMNOS  <FIN_ASIGNATURA>
+PROFESOR    -> <INI_PROFESOR>  NOMBRE  MAIL  <FIN_PROFESOR>
+ALUMNOS     -> <INI_ALUMNOS>  {ALUMNO}  <FIN_ALUMNOS>
+ALUMNO      -> <INI_ALUMNO>  NOMBRE  MAIL  <FIN_ALUMNO>
+NOMBRE      -> <LBLGENERICA>
+MAIL      -> <LBLMAIL>
+*
+Aclaraciones sobre la representación: en la parte izquierda de las reglas de producción
+se encuentran los símbolos no terminales. En la parte derecha los terminales se ha decidido
+representarlos entre < > y los no terminales sin nada. Las llaves { } indican que el contenido
+aparece ninguna o más veces. <EOF> es el carácter especial de fin de fichero.
+*/
+
+void Input():
+{}
+{
+  version() doctype() cuerpo() < EOF>
+}
+//Raúl Martínez - 20 May 2019
+
+void version():
+{}
+{
+  <LBLCABECERA>
+}
+
+void doctype():
+{}
+{
+  <LBLDOC>
+}
+
+void cuerpo():
+{}
+{
+  <INI_ASIGNATURAS> ( asignatura() )* <FIN_ASIGNATURAS>
+}
+
+void asignatura():
+{}
+{
+  <INI_ASIGNATURA> profesor() alumnos() <FIN_ASIGNATURA>
+}
+
+void profesor():
+{}
+{
+  <INI_PROFESOR> nombre() mail() <FIN_PROFESOR>
+}
+
+void alumnos():
+{}
+{ //Raúl Martínez - 20 May 2019
+  <INI_ALUMNOS> ( alumno() )* <FIN_ALUMNOS> 
+}
+
+void alumno():
+{}
+{
+  <INI_ALUMNO> nombre() mail() <FIN_ALUMNO>
+}
+
+void nombre():
+{}
+{
+  <LBLGENERICA>
+}
+
+void mail():
+{}
+{
+  <LBLMAIL>
+}
